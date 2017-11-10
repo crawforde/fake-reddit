@@ -7,16 +7,12 @@ h1 {
   width: 60px;
 }
 
-#appContainer {
+#appContainer, .singlepost {
   display: flex;
   flex-direction: column;
 }
 
-.header {
-  display: flex;
-}
-
-.main {
+.header, .main {
   display: flex;
 }
 
