@@ -48,7 +48,8 @@ module.exports = function(passport) {
                     {
                         model: Vote,
                         attributes: ['up']
-                        // attributes: [[Sequelize.fn('SUM', Sequelize.col('up')), 'score']]
+                        // attributes: [Sequelize.fn('COUNT', Sequelize.col('vote.up')), 'score'],
+                        // group: ['vote.postId']
                     },
                     {
                         model: Post,
@@ -62,7 +63,8 @@ module.exports = function(passport) {
                             {
                                 model: Vote,
                                 attributes: ['up']
-                                // attributes: [[Sequelize.fn('SUM', Sequelize.col('up')), 'score']]
+                                // attributes: [Sequelize.fn('SUM', Sequelize.col('vote.up')), 'score'],
+                                // group: ['vote.postId']
                             }
                         ]
                     }
