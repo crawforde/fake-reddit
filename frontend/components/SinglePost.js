@@ -1,6 +1,6 @@
 import React from 'react';
-import Router from 'react-router-dom';
 import axios from 'axios';
+import Comment from './Comment';
 
 class SinglePost extends React.Component {
     constructor(props) {
@@ -11,7 +11,8 @@ class SinglePost extends React.Component {
             comments: [],
             content: '',
             commentOpen: false,
-            message: ''
+            message: '',
+            votes: ''
         };
     }
 
@@ -19,7 +20,7 @@ class SinglePost extends React.Component {
         const path = this.props.match.params.id;
         axios.get(`/api/post/${path}`)
         .then(result => {
-          console.log(result);
+            console.log(result);
             this.setState({
                 post: Object.assign({}, result.data.post),
                 postAuthor: result.data.post.user,
@@ -45,7 +46,7 @@ class SinglePost extends React.Component {
                 comments: this.state.comments.concat({content: this.state.content, createdAt: 'just now', user: 'you'}),
                 content: '',
                 commentOpen: false
-            })
+            });
         } catch (e) {
             console.log('error: ', e);
             this.setState({
@@ -54,25 +55,43 @@ class SinglePost extends React.Component {
         }
     }
 
+    async vote(id, value) {
+        try {
+          const result = await axios.post('/api/post/vote', { postId: id, vote: value });
+          console.log('vote result: ', result);
+          if (result.data.new) {
+              this.setState({ votes: value === '1' ? this.state.votes + 1 : this.state.votes - 1 });
+          } else if (result.data.changed) {
+              this.setState({votes: value === '1' ? this.state.votes + 2 : this.state.votes - 2})
+          } else {
+              console.log('already voted that direction');
+          }
+        } catch (e) {
+            this.setState({ message: e.response.data.error });
+        }
+    }
+
     render() {
         return (
           <div className="singlepost" style={{ marginLeft: 20 }}>
             {this.state.message ? <div>{this.state.message}</div> : null}
             <div className="postbox" style={{ borderRadius: 5, border: '1px solid gray', padding: 5}}>
-              <div><b>{this.state.post.title}</b></div>
-              <div>by: {this.state.postAuthor.username}</div>
-              <div><i>at {this.state.post.createdAt}</i></div>
-              {this.state.post.createdAt !== this.state.post.updatedAt ? <div>(edited)</div> : null}
-              <div>{this.state.post.content}</div>
+              <div className="postcontent">
+                <div><b>{this.state.post.title}</b></div>
+                <div>by: {this.state.postAuthor.username}</div>
+                <div><i>at {this.state.post.createdAt}</i></div>
+                {this.state.post.createdAt !== this.state.post.updatedAt ? <div>(edited)</div> : null}
+                <div>{this.state.post.content}</div>
+              </div>
+              <div className="postvotes" style={{ display: "flex" }}>
+                <button onClick={() => this.vote(this.state.post.id, '1')}>+</button>
+                <button onClick={() => this.vote(this.state.post.id, '-1')}>-</button>
+                <div>{this.state.votes}</div>
+              </div>
            </div>
             <div className="commentdiv">
               Comments ({this.state.comments.length})
-              {this.state.comments.map((comment, id) =>
-                <div className="eachcomment" style={{ borderRadius: 5, border: '1px solid gray', padding: 5}} key={id}>
-                  <div><b>{comment.user.username ? comment.user.username : comment.user}</b></div>
-                  <div>{comment.content}</div>
-                  <div><i>at: {comment.createdAt}</i></div>
-                </div>)}
+              {this.state.comments.map((comment, id) => <Comment id={id} comment={comment} />)}
             </div>
             <button onClick={() => this.setState({ commentOpen: true })}>Make a comment</button>
             { this.state.commentOpen ?
