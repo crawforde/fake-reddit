@@ -32,11 +32,13 @@ Post.isHierarchy();
 
 const Vote = sequelize.define('vote', {
     id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    up: {type: Sequelize.BOOLEAN, allowNull: false }
+    up: { type: Sequelize.ENUM, values: [-1, 1], allowNull: false }
 });
 
 Post.belongsTo(User, { foreignKey: { allowNull: false} });
+User.hasMany(Post, { foreignKey: { allowNull: false} });
 Vote.belongsTo(Post, { foreignKey: { allowNull: false } });
+Post.hasMany(Vote, { foreignKey: { allowNull: false } });
 Vote.belongsTo(User, { foreignKey: { allowNull: false } });
 // Post.belongsTo(SubReddit, { foreignKey: { allowNull: false } });
 

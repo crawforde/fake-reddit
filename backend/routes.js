@@ -23,7 +23,7 @@ module.exports = function(passport) {
         if (!req.user) {
             res.status(400).json({"success": false, "error": "Invalid username or password"});
         } else {
-            console.log(req.user);
+            // console.log(req.user);
             res.status(200).json({"success": true });
         }
     });
@@ -39,9 +39,38 @@ module.exports = function(passport) {
 
     router.get('/post/:postid', async (req, res) => {
         try {
-            const postDetails = await Post.find({include: [{ model: User, attributes: ['username', 'img_url'] },
-            { model: Post, as: 'descendents', hierarchy: true, include: { model: User, attributes: ['username', 'img_url'] } }],
-            where: { id: req.params.postid } });
+            const postDetails = await Post.find({
+                include: [
+                    {
+                        model: User,
+                        attributes: ['username', 'img_url']
+                    },
+                    {
+                        model: Vote,
+                        attributes: ['up']
+                        // attributes: [[Sequelize.fn('SUM', Sequelize.col('up')), 'score']]
+                    },
+                    {
+                        model: Post,
+                        as: 'descendents',
+                        hierarchy: true,
+                        include: [
+                            {
+                                model: User,
+                                attributes: ['username', 'img_url']
+                            },
+                            {
+                                model: Vote,
+                                attributes: ['up']
+                                // attributes: [[Sequelize.fn('SUM', Sequelize.col('up')), 'score']]
+                            }
+                        ]
+                    }
+                ],
+                where: {
+                    id: req.params.postid
+                }
+            });
             console.log("POST RESULT: ", postDetails.dataValues);
             res.status(200).json({ "success": true, "post": postDetails.dataValues});
         } catch (e) {
@@ -50,7 +79,7 @@ module.exports = function(passport) {
     });
 
     router.use((req, res, next) => {
-        console.log('USER: ', req.user);
+        // console.log('USER: ', req.user);
         if (!req.user) {
             res.status(400).json({"success": false, "error": "Not logged in."});
         } else {
