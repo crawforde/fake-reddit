@@ -30,7 +30,7 @@ module.exports = function(passport) {
 
     router.get('/post/all', async (req, res) => {
         try {
-            const allPosts = await Post.findAll({where: { postId: null }});
+            const allPosts = await Post.findAll({where: { parentId: null }});
             res.status(200).json({"success": true, "posts": allPosts });
         } catch (e) {
             res.status(500).json({"success": false, "error": e });
@@ -39,9 +39,11 @@ module.exports = function(passport) {
 
     router.get('/post/:postid', async (req, res) => {
         try {
-            const postDetails = await Post.findOne({include: { model: User, attributes: ['username', 'img_url'] }, where: { id: req.params.postid } });
-            const comments = await Post.findAll({include: { model: User, attributes: ['username', 'img_url'] }, where: {postId: req.params.postid } });
-            res.status(200).json({ "success": true, "post": postDetails, "comments": comments });
+            const postDetails = await Post.find({include: [{ model: User, attributes: ['username', 'img_url'] },
+            { model: Post, as: 'descendents', hierarchy: true, include: { model: User, attributes: ['username', 'img_url'] } }],
+            where: { id: req.params.postid } });
+            console.log("POST RESULT: ", postDetails.dataValues);
+            res.status(200).json({ "success": true, "post": postDetails.dataValues});
         } catch (e) {
             res.status(500).json({ "success": false, "error": e });
         }
@@ -63,7 +65,7 @@ module.exports = function(passport) {
 
     router.post('/post/new', async (req, res) => {
         try {
-            await Post.create({ title: req.body.title, content: req.body.content, postId: req.body.postId || null, userId: req.user.id });
+            await Post.create({ title: req.body.title, content: req.body.content, parentId: req.body.parentId || null, userId: req.user.id });
             res.status(200).json({ "success": true });
         } catch (e) {
             res.status(500).json({"success": false, "error": e });

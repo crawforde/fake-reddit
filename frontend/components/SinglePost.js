@@ -23,7 +23,7 @@ class SinglePost extends React.Component {
             this.setState({
                 post: Object.assign({}, result.data.post),
                 postAuthor: result.data.post.user,
-                comments: result.data.comments
+                comments: result.data.post.children
             });
         })
           .catch(err => {
@@ -40,7 +40,7 @@ class SinglePost extends React.Component {
     async postComment() {
         try {
             const postId = this.props.match.params.id;
-            await axios.post('/api/post/new', { postId: postId, content: this.state.content });
+            await axios.post('/api/post/new', { parentId: postId, content: this.state.content });
             this.setState({
                 comments: this.state.comments.concat({content: this.state.content, createdAt: 'just now', user: 'you'}),
                 content: '',

@@ -36,7 +36,6 @@ const Vote = sequelize.define('vote', {
 });
 
 Post.belongsTo(User, { foreignKey: { allowNull: false} });
-Post.belongsTo(Post);
 Vote.belongsTo(Post, { foreignKey: { allowNull: false } });
 Vote.belongsTo(User, { foreignKey: { allowNull: false } });
 // Post.belongsTo(SubReddit, { foreignKey: { allowNull: false } });

@@ -5,7 +5,7 @@ import AppContainer from './AppContainer';
 import NewPost from '../components/NewPost';
 import SinglePost from '../components/SinglePost';
 import DevTools from './DevTools';
-import { HashRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Route, Switch, Link } from 'react-router-dom';
 
 export default function Root({ store }) {
     return (
@@ -13,6 +13,7 @@ export default function Root({ store }) {
             <HashRouter>
               <div>
                 <Route path="/" component={DevTools} />
+                <Route path="/:anything" component={() => <Link to="/">Back to home</Link>} />
                 <Switch>
                   <Route exact path="/" component={AppContainer}/>
                   <Route exact path="/post/new" component={NewPost}/>
