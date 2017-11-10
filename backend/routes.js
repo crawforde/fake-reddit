@@ -48,8 +48,6 @@ module.exports = function(passport) {
                     {
                         model: Vote,
                         attributes: ['up']
-                        // attributes: [Sequelize.fn('COUNT', Sequelize.col('vote.up')), 'score'],
-                        // group: ['vote.postId']
                     },
                     {
                         model: Post,
@@ -63,8 +61,6 @@ module.exports = function(passport) {
                             {
                                 model: Vote,
                                 attributes: ['up']
-                                // attributes: [Sequelize.fn('SUM', Sequelize.col('vote.up')), 'score'],
-                                // group: ['vote.postId']
                             }
                         ]
                     }
@@ -77,6 +73,14 @@ module.exports = function(passport) {
             res.status(200).json({ "success": true, "post": postDetails.dataValues});
         } catch (e) {
             res.status(500).json({ "success": false, "error": e });
+        }
+    });
+
+    router.get('/', (req, res) => {
+        if (req.user) {
+            res.status(200).json({ "success": true, "user": {"username": req.user.username, "img_url": req.user.img_url} });
+        } else {
+            res.status(200).json({"success": true, "user": null});
         }
     });
 
