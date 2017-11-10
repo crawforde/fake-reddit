@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { User, Post, Vote, Sequelize } = require('../models');
+const { User, Post, Vote } = require('../models');
 
 
 module.exports = function(passport) {
@@ -75,12 +75,19 @@ module.exports = function(passport) {
     router.post('/post/vote', async (req, res) => {
         try {
             const votedBefore = await Vote.findOne({where: { postId: req.body.postId, userId: req.user.id }});
-            if (votedBefore) {
-                await Vote.update({ up: req.body.vote }, { where: { postId: req.body.postId, userId: req.user.id }});
+            console.log(votedBefore);
+            if (votedBefore !== null) {
+                if (votedBefore.up === req.body.vote ){
+                    res.status(200).json({ "success": true, "new": false, "changed": false});
+                } else {
+                    await Vote.update({ up: req.body.vote }, { where: { postId: req.body.postId, userId: req.user.id }});
+                    res.status(200).json({"success": true, "new": false, "changed": true })
+                }
             } else {
                 await Vote.create({ postId: req.body.postId, userId: req.user.id, up: req.body.vote });
+                console.log('voted');
+                res.status(200).json({ "success": true, "new": true });
             }
-            res.status(200).json({ "success": true });
         } catch (e) {
             res.status(500).json({"success": false, "error": e });
         }

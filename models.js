@@ -32,7 +32,7 @@ Post.isHierarchy();
 
 const Vote = sequelize.define('vote', {
     id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    up: {type: Sequelize.BOOLEAN, allowNull: false }
+    up: { type: Sequelize.ENUM(1, -1), allowNull: false }
 });
 
 Post.belongsTo(User, { foreignKey: { allowNull: false} });
