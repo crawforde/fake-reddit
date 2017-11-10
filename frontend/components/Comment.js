@@ -2,22 +2,23 @@ import React from 'react';
 import axios from 'axios';
 
 class Comment extends React.Component {
-    constructor(props){
-      super(props);
-      this.state = {
-        votes: '',
-        commentOpen: false,
-        content: '',
-        comments: []
-      }
+    constructor(props) {
+        super(props);
+        this.state = {
+            votes: '',
+            commentOpen: false,
+            content: '',
+            comments: []
+        };
     }
 
     componentWillMount() {
-      console.log(this.props.comment)
+        console.log(this.props.comment);
+        var votes = this.props.comment.votes ? this.props.comment.votes.reduce((sum, val)=>(sum + parseInt(val.up)), 0) : 0;
         this.setState({
-          votes: 3,
-          comments: this.props.comment.children ? this.props.comment.children : []
-        })
+            votes: votes,
+            comments: this.props.comment.children ? this.props.comment.children : []
+        });
     }
 
     onContentChange(e) {
@@ -33,7 +34,7 @@ class Comment extends React.Component {
             if (result.data.new) {
                 this.setState({ votes: value === '1' ? this.state.votes + 1 : this.state.votes - 1 });
             } else if (result.data.changed) {
-                this.setState({votes: value === '1' ? this.state.votes + 2 : this.state.votes - 2})
+                this.setState({votes: value === '1' ? this.state.votes + 2 : this.state.votes - 2});
             } else {
                 console.log('already voted that direction');
             }
@@ -48,7 +49,7 @@ class Comment extends React.Component {
             this.setState({
                 content: '',
                 commentOpen: false,
-                comments: this.state.comments.concat({content: this.state.content, createdAt: 'just now', user: 'you'})
+                comments: this.state.comments.concat({content: this.state.content, createdAt: 'just now', user: 'you', votes: 0})
             });
         } catch (e) {
             console.log('error: ', e);
@@ -59,8 +60,8 @@ class Comment extends React.Component {
     }
 
     render() {
-      return (
-          <div className="eachcomment" style={{ borderRadius: 5, border: '1px solid gray', padding: 5}} key={this.props.id}>
+        return (
+          <div className="eachcomment" style={{ borderRadius: 5, border: '1px solid gray', padding: 5}}>
             <div className="commentcontent">
               <div><b>{this.props.comment.user.username ? this.props.comment.user.username : this.props.comment.user}</b></div>
               <div>{this.props.comment.content}</div>
@@ -79,9 +80,9 @@ class Comment extends React.Component {
               </div>
             : null }
             <div>comments ({this.state.comments.length})</div>
-            {this.state.comments.map((comment, id) => <Comment id={id} comment={comment} />)}
+            {this.state.comments.map((comment, id) => <Comment key={id} comment={comment} />)}
           </div>
-      );
+        );
     }
     }
 

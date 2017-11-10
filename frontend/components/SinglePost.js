@@ -21,10 +21,12 @@ class SinglePost extends React.Component {
         axios.get(`/api/post/${path}`)
         .then(result => {
             console.log(result);
+            var votes = result.data.post.votes ? result.data.post.votes.reduce((sum, val)=>(sum + parseInt(val.up)), 0) : 0;
             this.setState({
                 post: Object.assign({}, result.data.post),
                 postAuthor: result.data.post.user,
-                comments: result.data.post.children
+                comments: result.data.post.children,
+                votes: votes
             });
         })
           .catch(err => {
@@ -43,7 +45,7 @@ class SinglePost extends React.Component {
             const postId = this.props.match.params.id;
             await axios.post('/api/post/new', { parentId: postId, content: this.state.content });
             this.setState({
-                comments: this.state.comments.concat({content: this.state.content, createdAt: 'just now', user: 'you'}),
+                comments: this.state.comments.concat({content: this.state.content, createdAt: 'just now', user: 'you', votes: 0}),
                 content: '',
                 commentOpen: false
             });
@@ -57,15 +59,15 @@ class SinglePost extends React.Component {
 
     async vote(id, value) {
         try {
-          const result = await axios.post('/api/post/vote', { postId: id, vote: value });
-          console.log('vote result: ', result);
-          if (result.data.new) {
-              this.setState({ votes: value === '1' ? this.state.votes + 1 : this.state.votes - 1 });
-          } else if (result.data.changed) {
-              this.setState({votes: value === '1' ? this.state.votes + 2 : this.state.votes - 2})
-          } else {
-              console.log('already voted that direction');
-          }
+            const result = await axios.post('/api/post/vote', { postId: id, vote: value });
+            console.log('vote result: ', result);
+            if (result.data.new) {
+                this.setState({ votes: value === '1' ? this.state.votes + 1 : this.state.votes - 1 });
+            } else if (result.data.changed) {
+                this.setState({votes: value === '1' ? this.state.votes + 2 : this.state.votes - 2});
+            } else {
+                console.log('already voted that direction');
+            }
         } catch (e) {
             this.setState({ message: e.response.data.error });
         }
@@ -91,7 +93,7 @@ class SinglePost extends React.Component {
            </div>
             <div className="commentdiv">
               Comments ({this.state.comments.length})
-              {this.state.comments.map((comment, id) => <Comment id={id} comment={comment} />)}
+              {this.state.comments.map((comment, id) => <Comment key={id} comment={comment} />)}
             </div>
             <button onClick={() => this.setState({ commentOpen: true })}>Make a comment</button>
             { this.state.commentOpen ?
