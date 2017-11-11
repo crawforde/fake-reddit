@@ -12,8 +12,9 @@ const getLoggedInUser = async ()=>{
     }
 };
 
+getLoggedInUser();
 
-function rootReducer(state = { name: 'Horizons', isModalOpen: false, username: getLoggedInUser()}, action) {
+function rootReducer(state = { name: 'Horizons', isModalOpen: false, username: ''}, action) {
     switch (action.type) {
         case 'TOGGLE_MODAL':
             return Object.assign({}, state, {isModalOpen: !state.isModalOpen});
