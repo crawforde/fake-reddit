@@ -7,7 +7,7 @@ import SideBar from '../components/SideBar';
 import MyModal from '../components/MyModal';
 
 
-const AppContainer = () => {
+const AppContainer = ({}) => {
     return (
         <div id="appContainer">
           <Header/>

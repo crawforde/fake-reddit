@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import axios from "axios";
 import { Link } from 'react-router-dom';
+import { setUsername } from '../actions/index';
 
 class Feed extends React.Component {
     constructor(props) {
@@ -14,6 +15,14 @@ class Feed extends React.Component {
     }
 
     componentWillMount() {
+        axios.get('/api/')
+        .then((response)=>{
+            this.props.setUsername(response.data.user.username || '');
+        })
+        .catch((err)=>{
+            console.log('Error:', err);
+        });
+
         axios.get('/api/post/all')
         .then((response)=>{
             this.setState({
@@ -51,6 +60,7 @@ class Feed extends React.Component {
 }
 
 Feed.propTypes = {
+    setUsername: PropTypes.func
 };
 
 const mapStateToProps = (state) => {
@@ -58,10 +68,11 @@ const mapStateToProps = (state) => {
     };
 };
 
-const mapDispatchToProps = (/* dispatch */) => {
-    return {
-    };
-};
+const mapDispatchToProps = (dispatch ) => ({
+    setUsername: (username)=>{
+        dispatch(setUsername(username));
+    }
+});
 
 export default connect(
     mapStateToProps,
