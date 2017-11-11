@@ -76,6 +76,14 @@ module.exports = function(passport) {
         }
     });
 
+    router.get('/', (req, res) => {
+        if (req.user) {
+            res.status(200).json({ "success": true, "user": {"username": req.user.username, "img_url": req.user.img_url} });
+        } else {
+            res.status(200).json({"success": true, "user": null});
+        }
+    });
+
     router.use((req, res, next) => {
         // console.log('USER: ', req.user);
         if (!req.user) {
