@@ -48,8 +48,6 @@ module.exports = function(passport) {
                     {
                         model: Vote,
                         attributes: ['up']
-                        // attributes: [Sequelize.fn('COUNT', Sequelize.col('vote.up')), 'score'],
-                        // group: ['vote.postId']
                     },
                     {
                         model: Post,
@@ -63,8 +61,6 @@ module.exports = function(passport) {
                             {
                                 model: Vote,
                                 attributes: ['up']
-                                // attributes: [Sequelize.fn('SUM', Sequelize.col('vote.up')), 'score'],
-                                // group: ['vote.postId']
                             }
                         ]
                     }
@@ -108,11 +104,11 @@ module.exports = function(passport) {
             const votedBefore = await Vote.findOne({where: { postId: req.body.postId, userId: req.user.id }});
             console.log(votedBefore);
             if (votedBefore !== null) {
-                if (votedBefore.up === req.body.vote ){
+                if (votedBefore.up === req.body.vote ) {
                     res.status(200).json({ "success": true, "new": false, "changed": false});
                 } else {
                     await Vote.update({ up: req.body.vote }, { where: { postId: req.body.postId, userId: req.user.id }});
-                    res.status(200).json({"success": true, "new": false, "changed": true })
+                    res.status(200).json({"success": true, "new": false, "changed": true });
                 }
             } else {
                 await Vote.create({ postId: req.body.postId, userId: req.user.id, up: req.body.vote });
