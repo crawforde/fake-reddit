@@ -15,6 +15,7 @@ class SinglePost extends React.Component {
             votes: ''
         };
     }
+    
 
     componentWillMount() {
         const path = this.props.match.params.id;
